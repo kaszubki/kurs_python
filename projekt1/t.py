@@ -1,14 +1,12 @@
 class TuringMachine(object):
-    def __init__(self):
-        self.historia = []
-        
     def read(self):
-        stan_s = raw_input()
+        self.history = []
+        start_state = raw_input()
         
-        self.stan_k = raw_input()
-        self.stan_k = self.stan_k.split(" ")
+        s = raw_input()
+        self.end_states = s.split(" ")
         
-        self.przejscia = {}
+        self.transitions = {}
         while True:
             s = raw_input()
             if s == "":
@@ -16,65 +14,65 @@ class TuringMachine(object):
             s = s.split(" ")
             s1 = (s[0], s[1])
             s2 = (s[2], s[3], s[4])
-            if self.przejscia.get(s1) is None:
-                self.przejscia[s1] = [s2]
+            if self.transitions.get(s1) is None:
+                self.transitions[s1] = [s2]
             else:
-                self.przejscia[s1].append(s2)
+                self.transitions[s1].append(s2)
         
-        tasma = raw_input()
-        pozycja = 0
-        while tasma[pozycja] == '-':
-            pozycja += 1
+        tape = raw_input()
+        position = 0
+        while tape[position] == '-':
+            position += 1
         
-        self.historia.append((stan_s, pozycja, tasma))
-        self.czas = 0
+        self.history.append((start_state, position, tape))
+        self.time = 0
         return
     
     def step(self):
-        stan, pos, tasma = self.historia[-1]
+        state, pos, tape = self.history[-1]
         
-        if stan in self.stan_k:
+        if state in self.end_states:
             print "My work here is done"
             return False
         
-        stan2, nast_k, ruch = self.przejscia[(stan, tasma[pos])][0]
-        tasma2 = tasma[:pos] + nast_k + tasma[pos+1:]
+        state2, ple, move = self.transitions[(state, tape[pos])][0]
+        tape2 = tape[:pos] + ple + tape[pos+1:]
         
         pos2 = pos
-        if ruch == "R":
+        if move == "R":
             pos2 += 1
-        elif ruch == "L":
+        elif move == "L":
             pos2 -= 1
         
         if pos2 == -1:
-            tasma2 = "-" + tasma2
+            tape2 = "-" + tape2
             pos2 = 0
             
-        if pos2 == len(tasma2):
-            tasma2 = tasma2 + "-"
+        if pos2 == len(tape2):
+            tape2 = tape2 + "-"
         
-        self.historia.append((stan2, pos2, tasma2))
-        self.czas += 1
+        self.history.append((state2, pos2, tape2))
+        self.time += 1
         return True
     
     def forward(self):
-        if self.czas < len(self.historia) - 1:
-            self.czas += 1
+        if self.time < len(self.history) - 1:
+            self.time += 1
             return True
         return self.step()
     
     def backward(self):
-        if self.czas == 0:
+        if self.time == 0:
             print "Already at the beginning, can't go back in time"
             return
-        self.czas -= 1
+        self.time -= 1
         return
     
     def show(self):
-        print "Tape: {0}".format(self.historia[self.czas][2])
-        print "Position: {0}".format(self.historia[self.czas][1])
-        print "State: {0}".format(self.historia[self.czas][0])
-        if self.historia[self.czas][0] in self.stan_k:
+        print "Tape: {0}".format(self.history[self.time][2])
+        print "Position: {0}".format(self.history[self.time][1])
+        print "State: {0}".format(self.history[self.time][0])
+        if self.history[self.time][0] in self.end_states:
             print "This is a final state"
         return
 
